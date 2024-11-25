@@ -1,7 +1,7 @@
 """
 PDF Processing Script with GUI
-Author: Ciaran Englebrecht & Josh Henry
-Copyright (c) 2024 Prendiville Catholic College
+Author: Ciaran Englebrecht
+Copyright (c) 2024 
 
 Description:
 This script extracts student names and numbers from each page of a PDF document,
