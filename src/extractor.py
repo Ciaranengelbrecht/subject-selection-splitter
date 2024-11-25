@@ -154,7 +154,7 @@ class SubjectSelectionSplitter:
                     output_pdf.add_page(page)
                     
                     # Updated filename format with underscore before year level
-                    filename = f"{student_id}_{lastname}_{firstname}_{year_level}_{self.year.get()}_Subject_Selection.pdf"
+                    filename = f"{student_id}_{lastname}_{firstname}_{year_level}_{self.year.get()} Subjects.pdf"
                     filepath = os.path.join(output_dir, filename)
                     
                     # Save PDF
