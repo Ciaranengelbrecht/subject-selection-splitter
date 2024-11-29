@@ -385,16 +385,22 @@ class SubjectSelectionSplitter:
                 student_id, lastname, firstname, year_level = self.extract_student_info(text)
                 
                 if all([student_id, lastname, firstname, year_level]):
-                    # Create new PDF with single page
+                    # Create new PDF with modified page
                     output_pdf = PyPDF2.PdfWriter()
-                    output_pdf.add_page(page)
                     
-                    # Updated filename format with underscore before year level
+                    # Create temporary PDF reader for modified page
+                    temp_reader = PyPDF2.PdfReader(io.BytesIO(modified_pdf_bytes.getvalue()))
+                    modified_page = temp_reader.pages[0]  # Get first page from modified PDF
+                    
+                    # Add modified page to output
+                    output_pdf.add_page(modified_page)
+                    
+                    # Updated filename format
                     filename = f"{student_id}_{lastname}_{firstname}_{year_level}_{self.year.get()} Subjects.pdf"
                     filepath = os.path.join(output_dir, filename)
                     
                     with open(filepath, 'wb') as output_file:
-                        output_file.write(modified_pdf_bytes.getvalue())
+                        output_pdf.write(output_file)
                 
                 # Clean up temp file
                 os.remove(temp_path)
