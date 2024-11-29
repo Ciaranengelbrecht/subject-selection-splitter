@@ -43,9 +43,15 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
           brew install tcl-tk
+          brew install poppler
+      - name: Get Poppler path
+        run: |
+          echo "POPPLER_PATH=$(brew --prefix poppler)/bin" >> $GITHUB_ENV
       - name: Build with PyInstaller
         run: |
           pyinstaller macos.spec --clean
+        env:
+          POPPLER_PATH: ${{ env.POPPLER_PATH }}
       - name: Fix permissions
         run: |
           chmod -R 755 dist/SubjectSelectionSplitter-Mac.app

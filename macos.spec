@@ -1,10 +1,17 @@
 # macos.spec
 block_cipher = None
 
+# Get Poppler path from environment
+import os
+poppler_path = os.getenv('POPPLER_PATH', '/opt/homebrew/bin')
+
 a = Analysis(
     ['src/extractor.py'],
     pathex=[],
-    binaries=[],
+    binaries=[
+        (os.path.join(poppler_path, 'pdftoppm'), 'pdf2image'),
+        (os.path.join(poppler_path, 'pdfinfo'), 'pdf2image'),
+    ],
     datas=[],
     hiddenimports=[
         'PIL._tkinter_finder',
