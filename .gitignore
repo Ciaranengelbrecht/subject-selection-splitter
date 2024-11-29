@@ -4,7 +4,6 @@ __pycache__/
 *$py.class
 build/
 dist/
-*.spec
 
 # Virtual Environment
 venv/

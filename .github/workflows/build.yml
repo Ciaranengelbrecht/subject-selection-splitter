@@ -45,41 +45,14 @@ jobs:
           brew install tcl-tk
       - name: Build with PyInstaller
         run: |
-          pyinstaller --onefile --windowed --name SubjectSelectionSplitter-Mac \
-            --hidden-import PIL._tkinter_finder \
-            --hidden-import tkinter \
-            --hidden-import tkinter.filedialog \
-            --hidden-import tkinter.messagebox \
-            --hidden-import tkinter.ttk \
-            src/extractor.py
-      - name: Create app bundle
+          pyinstaller macos.spec --clean
+      - name: Fix permissions
         run: |
-          mkdir -p dist/SubjectSelectionSplitter-Mac.app/Contents/MacOS
-          mv dist/SubjectSelectionSplitter-Mac dist/SubjectSelectionSplitter-Mac.app/Contents/MacOS/
-          echo '<?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>CFBundleExecutable</key>
-            <string>SubjectSelectionSplitter-Mac</string>
-            <key>CFBundleIdentifier</key>
-            <string>com.ciaranengelbrecht.subjectsplitter</string>
-            <key>CFBundleName</key>
-            <string>Subject Selection Splitter</string>
-            <key>CFBundlePackageType</key>
-            <string>APPL</string>
-            <key>CFBundleShortVersionString</key>
-            <string>1.0.0</string>
-            <key>LSMinimumSystemVersion</key>
-            <string>10.10</string>
-            <key>NSHighResolutionCapable</key>
-            <true/>
-          </dict>
-          </plist>' > dist/SubjectSelectionSplitter-Mac.app/Contents/Info.plist
+          chmod -R 755 dist/SubjectSelectionSplitter-Mac.app
       - name: Create ZIP archive
         run: |
           cd dist
-          zip -r SubjectSelectionSplitter-Mac.zip SubjectSelectionSplitter-Mac.app
+          ditto -c -k --keepParent SubjectSelectionSplitter-Mac.app SubjectSelectionSplitter-Mac.zip
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v3
         with:
