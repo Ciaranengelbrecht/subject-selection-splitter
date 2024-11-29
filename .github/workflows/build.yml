@@ -55,12 +55,14 @@ jobs:
           ls -l $POPPLER_LIB
       - name: Build with PyInstaller
         run: |
-          mkdir -p dist/lib
+          mkdir -p dist/lib dist/bin
           cp ${{ env.POPPLER_LIB }}/libpoppler*.dylib dist/lib/
-          pyinstaller macos.spec --clean
+          cp ${{ env.POPPLER_BIN }}/pdf* dist/bin/
+          DYLD_LIBRARY_PATH=${{ env.POPPLER_LIB }} pyinstaller macos.spec --clean
         env:
           POPPLER_PATH: ${{ env.POPPLER_BIN }}
           POPPLER_LIB: ${{ env.POPPLER_LIB }}
+          DYLD_LIBRARY_PATH: ${{ env.POPPLER_LIB }}
       - name: Fix permissions
         run: |
           chmod -R 755 dist/SubjectSelectionSplitter-Mac.app

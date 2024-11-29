@@ -368,18 +368,33 @@ class SubjectSelectionSplitter:
 
     def process_single_pdf(self, input_path, output_path):
         """Process single page PDF and blank columns"""
-        # Convert PDF to images
-        images = convert_from_path(input_path)
-        
-        # Process first/only page
-        modified_image = self.blank_columns(images[0])
-        
-        # Convert back to PDF
-        img_byte_arr = io.BytesIO()
-        modified_image.save(img_byte_arr, format='PDF')
-        img_byte_arr.seek(0)
-        
-        return img_byte_arr
+        try:
+            # Get poppler path from environment or use default
+            poppler_path = os.getenv('POPPLER_PATH', '/opt/homebrew/bin')
+            
+            # Convert PDF to images with explicit poppler path
+            images = convert_from_path(
+                input_path,
+                poppler_path=poppler_path,
+                first_page=1,
+                last_page=1
+            )
+            
+            if not images:
+                raise Exception("Failed to convert PDF page")
+            
+            # Process first/only page
+            modified_image = self.blank_columns(images[0])
+            
+            # Convert back to PDF
+            img_byte_arr = io.BytesIO()
+            modified_image.save(img_byte_arr, format='PDF')
+            img_byte_arr.seek(0)
+            
+            return img_byte_arr
+            
+        except Exception as e:
+            raise Exception(f"PDF processing error: {str(e)}\nPoppler path: {poppler_path}")
 
     def process_pdf(self):
         if not self.file_path.get():
