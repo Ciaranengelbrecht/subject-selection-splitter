@@ -204,10 +204,9 @@ class CalibrationTool:
             messagebox.showwarning("Warning", "No regions selected")
             return
             
-        config_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            'blanking_regions.json'
-        )
+        # Get directory of running script
+        app_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
+        config_path = os.path.join(app_dir, 'blanking_regions.json')
         
         with open(config_path, 'w') as f:
             json.dump(self.regions, f)
@@ -352,7 +351,11 @@ class SubjectSelectionSplitter:
         width, height = image.size
         
         try:
-            with open('blanking_regions.json', 'r') as f:
+            # Get directory of running script
+            app_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
+            config_path = os.path.join(app_dir, 'blanking_regions.json')
+            
+            with open(config_path, 'r') as f:
                 regions = json.load(f)
                 
             for region in regions:
@@ -362,7 +365,9 @@ class SubjectSelectionSplitter:
                 y2 = int(region['y2'] * height)
                 draw.rectangle([x1, y1, x2, y2], fill='white')
         except FileNotFoundError:
-            print("No blanking regions configured")
+            print(f"No blanking regions configured at {config_path}")
+        except Exception as e:
+            print(f"Error applying blanking: {str(e)}")
         
         return image
 
