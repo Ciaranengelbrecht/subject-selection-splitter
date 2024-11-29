@@ -50,32 +50,59 @@ class CalibrationTool:
         # Info label at top
         self.info_label = ttk.Label(
             self.container, 
-            text="Click and drag to select regions to blank out",
+            text="Loading PDF...",
             font=('Helvetica', 11)
         )
         self.info_label.pack(pady=(0, 10))
         
-        # Convert PDF page to image
-        images = convert_from_path(pdf_path)
-        self.original_image = images[0]
-        
-        # Resize for display
-        width = min(800, self.original_image.width)
-        height = int(width * self.original_image.height / self.original_image.width)
-        self.display_image = self.original_image.resize((width, height))
-        
-        # Canvas for image and selection
-        self.canvas = tk.Canvas(
-            self.container,
-            width=width,
-            height=height,
-            bg='white'
-        )
-        self.canvas.pack(pady=10)
-        
-        # Display image
-        self.photo = ImageTk.PhotoImage(self.display_image)
-        self.canvas.create_image(0, 0, anchor='nw', image=self.photo)
+        try:
+            # Get poppler path from environment or use default
+            poppler_path = os.getenv('POPPLER_PATH', '/opt/homebrew/bin')
+            
+            # Convert PDF page to image with explicit poppler path
+            images = convert_from_path(
+                pdf_path,
+                poppler_path=poppler_path,
+                first_page=1,
+                last_page=1
+            )
+            
+            if not images:
+                raise Exception("Failed to convert PDF page")
+                
+            self.original_image = images[0]
+            
+            # Resize for display
+            width = min(800, self.original_image.width)
+            height = int(width * self.original_image.height / self.original_image.width)
+            self.display_image = self.original_image.resize((width, height))
+            
+            # Canvas for image and selection
+            self.canvas = tk.Canvas(
+                self.container,
+                width=width,
+                height=height,
+                bg='white'
+            )
+            self.canvas.pack(pady=10)
+            
+            # Display image
+            self.photo = ImageTk.PhotoImage(self.display_image)
+            self.canvas.create_image(0, 0, anchor='nw', image=self.photo)
+            
+            self.info_label.config(
+                text="Click and drag to select regions to blank out"
+            )
+            
+            # Rest of initialization...
+            
+        except Exception as e:
+            messagebox.showerror(
+                "Error",
+                f"Failed to load PDF: {str(e)}\nPoppler path: {poppler_path}"
+            )
+            self.root.destroy()
+            return
         
         # Button frame
         btn_frame = ttk.Frame(self.container)

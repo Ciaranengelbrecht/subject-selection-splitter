@@ -9,8 +9,10 @@ a = Analysis(
     ['src/extractor.py'],
     pathex=[],
     binaries=[
-        (os.path.join(poppler_path, 'pdftoppm'), 'pdf2image'),
-        (os.path.join(poppler_path, 'pdfinfo'), 'pdf2image'),
+        (os.path.join(poppler_path, 'pdftoppm'), '.'),
+        (os.path.join(poppler_path, 'pdfinfo'), '.'),
+        (os.path.join(poppler_path, 'libpoppler.dylib'), '.'),
+        (os.path.join(poppler_path, 'libpoppler-cpp.dylib'), '.')
     ],
     datas=[],
     hiddenimports=[

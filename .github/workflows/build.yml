@@ -55,6 +55,10 @@ jobs:
       - name: Fix permissions
         run: |
           chmod -R 755 dist/SubjectSelectionSplitter-Mac.app
+      - name: Copy Poppler libraries
+        run: |
+          mkdir -p dist/SubjectSelectionSplitter-Mac.app/Contents/Frameworks/
+          cp $(brew --prefix poppler)/lib/libpoppler*.dylib dist/SubjectSelectionSplitter-Mac.app/Contents/Frameworks/
       - name: Create ZIP archive
         run: |
           cd dist
