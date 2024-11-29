@@ -42,28 +42,53 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install py2app
+          pip install pyobjc-framework-Cocoa
       - name: Create setup.py
         run: |
           echo 'from setuptools import setup
+          
+          OPTIONS = {
+              "argv_emulation": True,
+              "packages": [
+                  "PIL",
+                  "PyPDF2",
+                  "pdf2image",
+                  "tkinter",
+                  "tqdm",
+                  "json",
+                  "os",
+                  "sys",
+                  "io"
+              ],
+              "includes": [
+                  "PIL._tkinter_finder",
+                  "tkinter",
+                  "tkinter.filedialog",
+                  "tkinter.messagebox",
+                  "tkinter.ttk"
+              ],
+              "excludes": ["matplotlib", "numpy"],
+              "frameworks": ["Tcl", "Tk"],
+              "plist": {
+                  "CFBundleName": "SubjectSelectionSplitter",
+                  "CFBundleDisplayName": "Subject Selection Splitter",
+                  "CFBundleVersion": "1.0.0",
+                  "CFBundleIdentifier": "com.ciaranengelbrecht.subjectsplitter",
+                  "LSMinimumSystemVersion": "10.10",
+                  "NSHighResolutionCapable": True,
+                  "NSRequiresAquaSystemAppearance": False
+              }
+          }
+          
           setup(
+              name="SubjectSelectionSplitter",
               app=["src/extractor.py"],
               setup_requires=["py2app"],
-              options={
-                  "py2app": {
-                      "argv_emulation": True,
-                      "packages": ["PIL", "PyPDF2", "pdf2image"],
-                      "plist": {
-                          "CFBundleName": "SubjectSelectionSplitter",
-                          "CFBundleDisplayName": "Subject Selection Splitter",
-                          "CFBundleVersion": "1.0.0",
-                          "LSMinimumSystemVersion": "10.10",
-                      }
-                  }
-              }
+              options={"py2app": OPTIONS}
           )' > setup.py
       - name: Build macOS app
         run: |
-          python setup.py py2app
+          python setup.py py2app --packages=PIL,PyPDF2,pdf2image,tkinter
       - name: Create ZIP archive
         run: |
           cd dist
