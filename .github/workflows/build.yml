@@ -52,12 +52,11 @@ jobs:
                   "py2app": {
                       "argv_emulation": True,
                       "packages": ["PIL", "PyPDF2", "pdf2image"],
-                      "iconfile": "icon.icns",
                       "plist": {
                           "CFBundleName": "SubjectSelectionSplitter",
                           "CFBundleDisplayName": "Subject Selection Splitter",
                           "CFBundleVersion": "1.0.0",
-                          "CFBundleIdentifier": "com.ciaranengelbrecht.subjectsplitter",
+                          "LSMinimumSystemVersion": "10.10",
                       }
                   }
               }
