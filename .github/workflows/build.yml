@@ -22,7 +22,7 @@ jobs:
           pip install pyinstaller
       - name: Build with PyInstaller
         run: |
-          pyinstaller --onefile --windowed --name SubjectSelectionSplitter-Windows src/extractor.py
+          pyinstaller --onefile --windowed --name SubjectSelectionSplitter-Windows --hidden-import PIL._tkinter_finder --hidden-import tkinter --hidden-import tkinter.filedialog --hidden-import tkinter.messagebox --hidden-import tkinter.ttk src/extractor.py
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v3
         with:
@@ -41,52 +41,45 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install py2app
-          pip install pyobjc-framework-Cocoa
+          pip install pyinstaller
           brew install tcl-tk
-      - name: Create setup.py
+      - name: Build with PyInstaller
         run: |
-          echo 'from setuptools import setup
-          
-          OPTIONS = {
-              "argv_emulation": True,
-              "packages": [
-                  "PIL",
-                  "PyPDF2",
-                  "pdf2image",
-                  "tkinter",
-                  "tqdm"
-              ],
-              "includes": [
-                  "tkinter",
-                  "tkinter.filedialog",
-                  "tkinter.messagebox",
-                  "tkinter.ttk"
-              ],
-              "excludes": ["matplotlib", "numpy"],
-              "plist": {
-                  "CFBundleName": "SubjectSelectionSplitter",
-                  "CFBundleDisplayName": "Subject Selection Splitter",
-                  "CFBundleVersion": "1.0.0",
-                  "LSMinimumSystemVersion": "10.10",
-                  "NSHighResolutionCapable": True
-              }
-          }
-          
-          setup(
-              name="SubjectSelectionSplitter",
-              app=["src/extractor.py"],
-              data_files=[],
-              options={"py2app": OPTIONS},
-              setup_requires=["py2app"]
-          )' > setup.py
-      - name: Build macOS app
+          pyinstaller --onefile --windowed --name SubjectSelectionSplitter-Mac \
+            --hidden-import PIL._tkinter_finder \
+            --hidden-import tkinter \
+            --hidden-import tkinter.filedialog \
+            --hidden-import tkinter.messagebox \
+            --hidden-import tkinter.ttk \
+            src/extractor.py
+      - name: Create app bundle
         run: |
-          python setup.py py2app --no-strip
+          mkdir -p dist/SubjectSelectionSplitter-Mac.app/Contents/MacOS
+          mv dist/SubjectSelectionSplitter-Mac dist/SubjectSelectionSplitter-Mac.app/Contents/MacOS/
+          echo '<?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>CFBundleExecutable</key>
+            <string>SubjectSelectionSplitter-Mac</string>
+            <key>CFBundleIdentifier</key>
+            <string>com.ciaranengelbrecht.subjectsplitter</string>
+            <key>CFBundleName</key>
+            <string>Subject Selection Splitter</string>
+            <key>CFBundlePackageType</key>
+            <string>APPL</string>
+            <key>CFBundleShortVersionString</key>
+            <string>1.0.0</string>
+            <key>LSMinimumSystemVersion</key>
+            <string>10.10</string>
+            <key>NSHighResolutionCapable</key>
+            <true/>
+          </dict>
+          </plist>' > dist/SubjectSelectionSplitter-Mac.app/Contents/Info.plist
       - name: Create ZIP archive
         run: |
           cd dist
-          zip -r SubjectSelectionSplitter-Mac.zip SubjectSelectionSplitter.app
+          zip -r SubjectSelectionSplitter-Mac.zip SubjectSelectionSplitter-Mac.app
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v3
         with:
