@@ -41,12 +41,36 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pyinstaller
-      - name: Build with PyInstaller
+          pip install py2app
+      - name: Create setup.py
         run: |
-          pyinstaller --onefile --windowed --name SubjectSelectionSplitter-Mac src/extractor.py
+          echo 'from setuptools import setup
+          setup(
+              app=["src/extractor.py"],
+              setup_requires=["py2app"],
+              options={
+                  "py2app": {
+                      "argv_emulation": True,
+                      "packages": ["PIL", "PyPDF2", "pdf2image"],
+                      "iconfile": "icon.icns",
+                      "plist": {
+                          "CFBundleName": "SubjectSelectionSplitter",
+                          "CFBundleDisplayName": "Subject Selection Splitter",
+                          "CFBundleVersion": "1.0.0",
+                          "CFBundleIdentifier": "com.ciaranengelbrecht.subjectsplitter",
+                      }
+                  }
+              }
+          )' > setup.py
+      - name: Build macOS app
+        run: |
+          python setup.py py2app
+      - name: Create ZIP archive
+        run: |
+          cd dist
+          zip -r SubjectSelectionSplitter-Mac.zip SubjectSelectionSplitter.app
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v3
         with:
           name: SubjectSelectionSplitter-Mac
-          path: dist/SubjectSelectionSplitter-Mac
+          path: dist/SubjectSelectionSplitter-Mac.zip
