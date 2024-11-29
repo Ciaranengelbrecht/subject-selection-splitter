@@ -44,21 +44,26 @@ jobs:
           pip install pyinstaller
           brew install tcl-tk
           brew install poppler
-      - name: Get Poppler path
+      - name: Get Poppler paths
         run: |
-          echo "POPPLER_PATH=$(brew --prefix poppler)/bin" >> $GITHUB_ENV
+          POPPLER_BIN=$(brew --prefix poppler)/bin
+          POPPLER_LIB=$(brew --prefix poppler)/lib
+          echo "POPPLER_BIN=$POPPLER_BIN" >> $GITHUB_ENV
+          echo "POPPLER_LIB=$POPPLER_LIB" >> $GITHUB_ENV
+          # Verify paths exist
+          ls -l $POPPLER_BIN
+          ls -l $POPPLER_LIB
       - name: Build with PyInstaller
         run: |
+          mkdir -p dist/lib
+          cp ${{ env.POPPLER_LIB }}/libpoppler*.dylib dist/lib/
           pyinstaller macos.spec --clean
         env:
-          POPPLER_PATH: ${{ env.POPPLER_PATH }}
+          POPPLER_PATH: ${{ env.POPPLER_BIN }}
+          POPPLER_LIB: ${{ env.POPPLER_LIB }}
       - name: Fix permissions
         run: |
           chmod -R 755 dist/SubjectSelectionSplitter-Mac.app
-      - name: Copy Poppler libraries
-        run: |
-          mkdir -p dist/SubjectSelectionSplitter-Mac.app/Contents/Frameworks/
-          cp $(brew --prefix poppler)/lib/libpoppler*.dylib dist/SubjectSelectionSplitter-Mac.app/Contents/Frameworks/
       - name: Create ZIP archive
         run: |
           cd dist

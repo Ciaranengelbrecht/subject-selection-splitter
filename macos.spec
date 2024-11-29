@@ -4,6 +4,7 @@ block_cipher = None
 # Get Poppler path from environment
 import os
 poppler_path = os.getenv('POPPLER_PATH', '/opt/homebrew/bin')
+poppler_lib = os.getenv('POPPLER_LIB', '/opt/homebrew/lib')
 
 a = Analysis(
     ['src/extractor.py'],
@@ -11,8 +12,8 @@ a = Analysis(
     binaries=[
         (os.path.join(poppler_path, 'pdftoppm'), '.'),
         (os.path.join(poppler_path, 'pdfinfo'), '.'),
-        (os.path.join(poppler_path, 'libpoppler.dylib'), '.'),
-        (os.path.join(poppler_path, 'libpoppler-cpp.dylib'), '.')
+        (os.path.join(poppler_lib, 'libpoppler.dylib'), '.'),
+        (os.path.join(poppler_lib, 'libpoppler-cpp.dylib'), '.')
     ],
     datas=[],
     hiddenimports=[
